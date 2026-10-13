@@ -24,9 +24,6 @@ cwm draws an XOR outline of the frame on the root window and leaves the
 window itself where it is. The window is moved or resized once, when the
 button is released.
 
-This keeps heavy clients (browsers, Electron apps) from redrawing on every
-motion event while they are dragged.
-
 ### autogroup placement: `maximize`, `fullscreen`, `left`, `right`, `screen`
 
 `autogroup` takes an optional placement and an optional monitor:

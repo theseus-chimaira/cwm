@@ -100,7 +100,19 @@ triggered them. Now:
 - the state is written back to `_NET_WM_STATE` and listed in
   `_NET_SUPPORTED`.
 
+- a client that restacks itself (`XRaiseWindow`, i.e. a `ConfigureRequest`
+  with a stack mode) cannot cover them either.
+
 There is no key binding to toggle it; it is driven by the client.
+
+### Fix: windows mapped again from the iconic state stay hidden
+
+`pinentry-qt` maps its dialog iconic first and then maps it again with a
+normal initial state. cwm ignored a `MapRequest` for a window it already
+managed, so the PIN dialog never appeared - on top or not. Following ICCCM
+4.1.4, a `MapRequest` for an iconic window now shows it, and
+`_NET_WM_STATE_HIDDEN` is cleared when a window is shown. Windows that ask to
+start iconic still do.
 
 ## Testing
 
@@ -116,6 +128,10 @@ used on a real display:
 - `_NET_WM_STATE_ABOVE`, by requesting the state for a window and checking
   with `_NET_CLIENT_LIST_STACKING` that it stays on top when another window is
   raised or focused;
+- the pinentry fix, with a real `pinentry-qt`: the dialog is mapped and on
+  top after it opens, after another window is activated, after that window
+  raises itself and after it is clicked; a window with
+  `initial_state=IconicState` still starts hidden;
 - group names and the group count, by reading `_NET_DESKTOP_NAMES` and
   `_NET_NUMBER_OF_DESKTOPS`; `autogroup 9 ...` is rejected by `cwm -n`.
 

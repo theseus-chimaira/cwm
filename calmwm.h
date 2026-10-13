@@ -182,6 +182,7 @@ struct client_ctx {
 #define CLIENT_ACTIVE			0x2000
 #define CLIENT_SKIP_PAGER		0x4000
 #define CLIENT_SKIP_TASKBAR		0x8000
+#define CLIENT_ABOVE			0x10000
 
 #define CLIENT_SKIP_CYCLE		(CLIENT_HIDDEN | CLIENT_IGNORE | \
 					 CLIENT_SKIP_TASKBAR | CLIENT_SKIP_PAGER)
@@ -216,8 +217,8 @@ struct autogroup {
 	int			 region;	/* target monitor index, -1 = any */
 };
 /* autogroup placement besides CLIENT_MAXIMIZED and CLIENT_FULLSCREEN */
-#define AUTOGROUP_LEFT			0x10000
-#define AUTOGROUP_RIGHT			0x20000
+#define AUTOGROUP_LEFT			0x100000
+#define AUTOGROUP_RIGHT			0x200000
 TAILQ_HEAD(autogroup_q, autogroup);
 
 struct region_ctx {
@@ -400,7 +401,7 @@ enum ewmh {
 	_NET_WM_DESKTOP,
 	_NET_CLOSE_WINDOW,
 	_NET_WM_STATE,
-#define	_NET_WM_STATES_NITEMS	9
+#define	_NET_WM_STATES_NITEMS	10
 	_NET_WM_STATE_STICKY,
 	_NET_WM_STATE_MAXIMIZED_VERT,
 	_NET_WM_STATE_MAXIMIZED_HORZ,
@@ -409,6 +410,7 @@ enum ewmh {
 	_NET_WM_STATE_DEMANDS_ATTENTION,
 	_NET_WM_STATE_SKIP_PAGER,
 	_NET_WM_STATE_SKIP_TASKBAR,
+	_NET_WM_STATE_ABOVE,
 	_CWM_WM_STATE_FREEZE,
 	EWMH_NITEMS
 };
@@ -447,12 +449,14 @@ void			 client_ptr_inbound(struct client_ctx *, int);
 void			 client_ptr_save(struct client_ctx *);
 void			 client_ptr_warp(struct client_ctx *);
 void			 client_raise(struct client_ctx *);
+void			 client_raise_above(struct screen_ctx *);
 void			 client_remove(struct client_ctx *);
 void			 client_resize(struct client_ctx *, int);
 void			 client_set_active(struct client_ctx *);
 void			 client_set_name(struct client_ctx *);
 void			 client_show(struct client_ctx *);
 int			 client_snapcalc(int, int, int, int, int);
+void			 client_toggle_above(struct client_ctx *);
 void			 client_toggle_hidden(struct client_ctx *);
 void			 client_toggle_hmaximize(struct client_ctx *);
 void			 client_toggle_fullscreen(struct client_ctx *);

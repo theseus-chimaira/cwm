@@ -182,6 +182,7 @@ xu_atom_init(void)
 		"_NET_WM_STATE_DEMANDS_ATTENTION",
 		"_NET_WM_STATE_SKIP_PAGER",
 		"_NET_WM_STATE_SKIP_TASKBAR",
+		"_NET_WM_STATE_ABOVE",
 		"_CWM_WM_STATE_FREEZE",
 	};
 
@@ -471,6 +472,9 @@ xu_ewmh_handle_net_wm_state_msg(struct client_ctx *cc, int action,
 		{ _NET_WM_STATE_SKIP_TASKBAR,
 			CLIENT_SKIP_TASKBAR,
 			client_toggle_skip_taskbar},
+		{ _NET_WM_STATE_ABOVE,
+			CLIENT_ABOVE,
+			client_toggle_above },
 		{ _CWM_WM_STATE_FREEZE,
 			CLIENT_FREEZE,
 			client_toggle_freeze },
@@ -519,6 +523,8 @@ xu_ewmh_restore_net_wm_state(struct client_ctx *cc)
 			client_toggle_skip_pager(cc);
 		if (atoms[i] == ewmh[_NET_WM_STATE_SKIP_TASKBAR])
 			client_toggle_skip_taskbar(cc);
+		if (atoms[i] == ewmh[_NET_WM_STATE_ABOVE])
+			client_toggle_above(cc);
 		if (atoms[i] == ewmh[_CWM_WM_STATE_FREEZE])
 			client_toggle_freeze(cc);
 	}
@@ -542,6 +548,7 @@ xu_ewmh_set_net_wm_state(struct client_ctx *cc)
 		    oatoms[i] != ewmh[_NET_WM_STATE_DEMANDS_ATTENTION] &&
 		    oatoms[i] != ewmh[_NET_WM_STATE_SKIP_PAGER] &&
 		    oatoms[i] != ewmh[_NET_WM_STATE_SKIP_TASKBAR] &&
+		    oatoms[i] != ewmh[_NET_WM_STATE_ABOVE] &&
 		    oatoms[i] != ewmh[_CWM_WM_STATE_FREEZE])
 			atoms[j++] = oatoms[i];
 	}
@@ -564,6 +571,8 @@ xu_ewmh_set_net_wm_state(struct client_ctx *cc)
 		atoms[j++] = ewmh[_NET_WM_STATE_SKIP_PAGER];
 	if (cc->flags & CLIENT_SKIP_TASKBAR)
 		atoms[j++] = ewmh[_NET_WM_STATE_SKIP_TASKBAR];
+	if (cc->flags & CLIENT_ABOVE)
+		atoms[j++] = ewmh[_NET_WM_STATE_ABOVE];
 	if (cc->flags & CLIENT_FREEZE)
 		atoms[j++] = ewmh[_CWM_WM_STATE_FREEZE];
 	if (j > 0)

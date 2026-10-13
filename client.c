@@ -299,6 +299,15 @@ client_toggle_skip_taskbar(struct client_ctx *cc)
 }
 
 void
+client_toggle_above(struct client_ctx *cc)
+{
+	cc->flags ^= CLIENT_ABOVE;
+	xu_ewmh_set_net_wm_state(cc);
+	if (cc->flags & CLIENT_ABOVE)
+		XRaiseWindow(X_Dpy, cc->win);
+}
+
+void
 client_toggle_sticky(struct client_ctx *cc)
 {
 	cc->flags ^= CLIENT_STICKY;
@@ -480,6 +489,19 @@ void
 client_raise(struct client_ctx *cc)
 {
 	XRaiseWindow(X_Dpy, cc->win);
+	client_raise_above(cc->sc);
+}
+
+/* Keep windows that asked for _NET_WM_STATE_ABOVE on top of the rest. */
+void
+client_raise_above(struct screen_ctx *sc)
+{
+	struct client_ctx	*ac;
+
+	TAILQ_FOREACH(ac, &sc->clientq, entry) {
+		if ((ac->flags & CLIENT_ABOVE) && !(ac->flags & CLIENT_HIDDEN))
+			XRaiseWindow(X_Dpy, ac->win);
+	}
 }
 
 void
@@ -562,6 +584,7 @@ client_show(struct client_ctx *cc)
 	cc->flags &= ~CLIENT_HIDDEN;
 	xu_set_wm_state(cc->win, NormalState);
 	client_draw_border(cc);
+	client_raise_above(cc->sc);
 }
 
 void

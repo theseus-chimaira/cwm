@@ -79,6 +79,7 @@ group_show(struct group_ctx *gc)
 			client_show(cc);
 	}
 	group_restack(gc);
+	client_raise_above(gc->sc);
 	group_set_active(gc);
 }
 

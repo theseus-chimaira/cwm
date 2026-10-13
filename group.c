@@ -400,6 +400,25 @@ group_autogroup(struct client_ctx *cc)
 		client_toggle_fullscreen(cc);
 	else if (match->flags & CLIENT_MAXIMIZED)
 		client_toggle_maximize(cc);
+	else if (match->flags & (AUTOGROUP_LEFT | AUTOGROUP_RIGHT)) {
+		struct geom	 area;
+		int		 half;
+
+		/* Fill the left or right half of the monitor's work area. */
+		area = screen_area(sc, cc->geom.x + cc->geom.w / 2,
+		    cc->geom.y + cc->geom.h / 2, 1);
+		half = area.w / 2;
+		cc->geom.x = area.x;
+		cc->geom.w = half;
+		if (match->flags & AUTOGROUP_RIGHT) {
+			cc->geom.x += half;
+			cc->geom.w = area.w - half;
+		}
+		cc->geom.w -= cc->bwidth * 2;
+		cc->geom.y = area.y;
+		cc->geom.h = area.h - (cc->bwidth * 2);
+		client_resize(cc, 0);
+	}
 
 	return 1;
 }

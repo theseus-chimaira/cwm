@@ -75,7 +75,7 @@ typedef struct {
 %token	AUTOGROUP COMMAND IGNORE WM
 %token	YES NO BORDERWIDTH MOVEAMOUNT HTILE VTILE
 %token	COLOR SNAPDIST
-%token	MAXIMIZE FULLSCREEN SCREEN
+%token	MAXIMIZE FULLSCREEN SCREEN LEFT RIGHT
 %token	ACTIVEBORDER INACTIVEBORDER URGENCYBORDER
 %token	GROUPBORDER UNGROUPBORDER
 %token	MENUBG MENUFG
@@ -83,7 +83,7 @@ typedef struct {
 %token	ERROR
 %token	<v.string>		STRING
 %token	<v.number>		NUMBER
-%type	<v.number>		yesno
+%type	<v.number>		yesno placement screen
 %type	<v.string>		string numberstring
 %%
 
@@ -116,6 +116,22 @@ numberstring	: NUMBER				{
 			$$ = s;
 		}
 		| STRING
+		;
+
+placement	: MAXIMIZE			{ $$ = CLIENT_MAXIMIZED; }
+		| FULLSCREEN			{ $$ = CLIENT_FULLSCREEN; }
+		| LEFT				{ $$ = AUTOGROUP_LEFT; }
+		| RIGHT				{ $$ = AUTOGROUP_RIGHT; }
+		;
+
+screen		: /* empty */			{ $$ = -1; }
+		| SCREEN NUMBER			{
+			if ($2 < 0) {
+				yyerror("invalid screen");
+				YYERROR;
+			}
+			$$ = $2;
+		}
 		;
 
 yesno		: YES				{ $$ = 1; }
@@ -206,41 +222,14 @@ main		: FONTNAME STRING		{
 			free($3);
 			free($5);
 		}
-		| AUTOGROUP NUMBER MAXIMIZE STRING {
+		| AUTOGROUP NUMBER placement screen STRING {
 			if ($2 < 0 || $2 > 8) {
 				yyerror("invalid autogroup");
-				free($4);
+				free($5);
 				YYERROR;
 			}
-			conf_autogroup(conf, $2, NULL, $4, CLIENT_MAXIMIZED, -1);
-			free($4);
-		}
-		| AUTOGROUP NUMBER FULLSCREEN STRING {
-			if ($2 < 0 || $2 > 8) {
-				yyerror("invalid autogroup");
-				free($4);
-				YYERROR;
-			}
-			conf_autogroup(conf, $2, NULL, $4, CLIENT_FULLSCREEN, -1);
-			free($4);
-		}
-		| AUTOGROUP NUMBER MAXIMIZE SCREEN NUMBER STRING {
-			if ($2 < 0 || $2 > 8 || $5 < 0) {
-				yyerror("invalid autogroup");
-				free($6);
-				YYERROR;
-			}
-			conf_autogroup(conf, $2, NULL, $6, CLIENT_MAXIMIZED, $5);
-			free($6);
-		}
-		| AUTOGROUP NUMBER FULLSCREEN SCREEN NUMBER STRING {
-			if ($2 < 0 || $2 > 8 || $5 < 0) {
-				yyerror("invalid autogroup");
-				free($6);
-				YYERROR;
-			}
-			conf_autogroup(conf, $2, NULL, $6, CLIENT_FULLSCREEN, $5);
-			free($6);
+			conf_autogroup(conf, $2, NULL, $5, $3, $4);
+			free($5);
 		}
 		| IGNORE STRING {
 			conf_ignore(conf, $2);
@@ -384,11 +373,13 @@ lookup(char *s)
 		{ "htile",		HTILE},
 		{ "ignore",		IGNORE},
 		{ "inactiveborder",	INACTIVEBORDER},
+		{ "left",		LEFT},
 		{ "maximize",		MAXIMIZE},
 		{ "menubg",		MENUBG},
 		{ "menufg",		MENUFG},
 		{ "moveamount",		MOVEAMOUNT},
 		{ "no",			NO},
+		{ "right",		RIGHT},
 		{ "screen",		SCREEN},
 		{ "selfont", 		FONTSELCOLOR},
 		{ "snapdist",		SNAPDIST},

@@ -212,9 +212,12 @@ struct autogroup {
 	char			*class;
 	char			*name;
 	int 			 num;
-	int			 flags;		/* CLIENT_MAXIMIZED | CLIENT_FULLSCREEN */
+	int			 flags;		/* placement, see below */
 	int			 region;	/* target monitor index, -1 = any */
 };
+/* autogroup placement besides CLIENT_MAXIMIZED and CLIENT_FULLSCREEN */
+#define AUTOGROUP_LEFT			0x10000
+#define AUTOGROUP_RIGHT			0x20000
 TAILQ_HEAD(autogroup_q, autogroup);
 
 struct region_ctx {

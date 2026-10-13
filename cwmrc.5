@@ -38,7 +38,7 @@ Arguments containing whitespace should be surrounded by double quotes
 .Pp
 The following options are accepted:
 .Bl -tag -width Ds
-.It Ic autogroup Ar group Oo Ar windowname , Oc Ns Ar windowclass
+.It Ic autogroup Ar group Oo Ar placement Oo Ic screen Ar n Oc Oc Oo Ar windowname , Oc Ns Ar windowclass
 Automatically add new windows to
 .Ar group
 if their class property matches
@@ -56,6 +56,28 @@ If
 is 0, matching windows will not be added to any group; this may be
 used to override
 .Dq sticky group mode .
+.Pp
+.Ar placement
+is one of
+.Ic maximize ,
+.Ic fullscreen ,
+.Ic left
+or
+.Ic right ;
+.Ic left
+and
+.Ic right
+fill that half of the monitor's work area.
+With
+.Ic screen Ar n
+the window is placed on monitor
+.Ar n
+(0-based, RandR order) before
+.Ar placement
+is applied.
+.Ar placement
+cannot be combined with
+.Ar windowname .
 .Pp
 The name and class values, respectively, for existing windows
 are both set in the WM_CLASS property and may be obtained using

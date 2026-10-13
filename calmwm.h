@@ -212,6 +212,8 @@ struct autogroup {
 	char			*class;
 	char			*name;
 	int 			 num;
+	int			 flags;		/* CLIENT_MAXIMIZED | CLIENT_FULLSCREEN */
+	int			 region;	/* target monitor index, -1 = any */
 };
 TAILQ_HEAD(autogroup_q, autogroup);
 
@@ -562,7 +564,7 @@ void			 menuq_clear(struct menu_q *);
 int			 parse_config(const char *, struct conf *);
 
 void			 conf_autogroup(struct conf *, int, const char *,
-			     const char *);
+			     const char *, int, int);
 int			 conf_bind_key(struct conf *, const char *,
     			     const char *);
 int			 conf_bind_mouse(struct conf *, const char *,

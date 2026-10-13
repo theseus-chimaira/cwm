@@ -420,7 +420,8 @@ conf_wm_add(struct conf *c, const char *name, const char *path)
 }
 
 void
-conf_autogroup(struct conf *c, int num, const char *name, const char *class)
+conf_autogroup(struct conf *c, int num, const char *name, const char *class,
+    int flags, int region)
 {
 	struct autogroup	*ag;
 	char			*p;
@@ -443,6 +444,8 @@ conf_autogroup(struct conf *c, int num, const char *name, const char *class)
 		ag->class = xstrdup(p);
 	}
 	ag->num = num;
+	ag->flags = flags;
+	ag->region = region;
 	TAILQ_INSERT_TAIL(&c->autogroupq, ag, entry);
 }
 

@@ -75,6 +75,7 @@ typedef struct {
 %token	AUTOGROUP COMMAND IGNORE WM
 %token	YES NO BORDERWIDTH MOVEAMOUNT HTILE VTILE
 %token	COLOR SNAPDIST
+%token	MAXIMIZE FULLSCREEN SCREEN
 %token	ACTIVEBORDER INACTIVEBORDER URGENCYBORDER
 %token	GROUPBORDER UNGROUPBORDER
 %token	MENUBG MENUFG
@@ -191,7 +192,7 @@ main		: FONTNAME STRING		{
 				free($3);
 				YYERROR;
 			}
-			conf_autogroup(conf, $2, NULL, $3);
+			conf_autogroup(conf, $2, NULL, $3, 0, -1);
 			free($3);
 		}
 		| AUTOGROUP NUMBER STRING ',' STRING {
@@ -201,9 +202,45 @@ main		: FONTNAME STRING		{
 				free($5);
 				YYERROR;
 			}
-			conf_autogroup(conf, $2, $3, $5);
+			conf_autogroup(conf, $2, $3, $5, 0, -1);
 			free($3);
 			free($5);
+		}
+		| AUTOGROUP NUMBER MAXIMIZE STRING {
+			if ($2 < 0 || $2 > 9) {
+				yyerror("invalid autogroup");
+				free($4);
+				YYERROR;
+			}
+			conf_autogroup(conf, $2, NULL, $4, CLIENT_MAXIMIZED, -1);
+			free($4);
+		}
+		| AUTOGROUP NUMBER FULLSCREEN STRING {
+			if ($2 < 0 || $2 > 9) {
+				yyerror("invalid autogroup");
+				free($4);
+				YYERROR;
+			}
+			conf_autogroup(conf, $2, NULL, $4, CLIENT_FULLSCREEN, -1);
+			free($4);
+		}
+		| AUTOGROUP NUMBER MAXIMIZE SCREEN NUMBER STRING {
+			if ($2 < 0 || $2 > 9 || $5 < 0) {
+				yyerror("invalid autogroup");
+				free($6);
+				YYERROR;
+			}
+			conf_autogroup(conf, $2, NULL, $6, CLIENT_MAXIMIZED, $5);
+			free($6);
+		}
+		| AUTOGROUP NUMBER FULLSCREEN SCREEN NUMBER STRING {
+			if ($2 < 0 || $2 > 9 || $5 < 0) {
+				yyerror("invalid autogroup");
+				free($6);
+				YYERROR;
+			}
+			conf_autogroup(conf, $2, NULL, $6, CLIENT_FULLSCREEN, $5);
+			free($6);
 		}
 		| IGNORE STRING {
 			conf_ignore(conf, $2);
@@ -341,15 +378,18 @@ lookup(char *s)
 		{ "command",		COMMAND},
 		{ "font",		FONTCOLOR},
 		{ "fontname",		FONTNAME},
+		{ "fullscreen",		FULLSCREEN},
 		{ "gap",		GAP},
 		{ "groupborder",	GROUPBORDER},
 		{ "htile",		HTILE},
 		{ "ignore",		IGNORE},
 		{ "inactiveborder",	INACTIVEBORDER},
+		{ "maximize",		MAXIMIZE},
 		{ "menubg",		MENUBG},
 		{ "menufg",		MENUFG},
 		{ "moveamount",		MOVEAMOUNT},
 		{ "no",			NO},
+		{ "screen",		SCREEN},
 		{ "selfont", 		FONTSELCOLOR},
 		{ "snapdist",		SNAPDIST},
 		{ "sticky",		STICKY},

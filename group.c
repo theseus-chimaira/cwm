@@ -350,7 +350,7 @@ int
 group_autogroup(struct client_ctx *cc)
 {
 	struct screen_ctx	*sc = cc->sc;
-	struct autogroup	*ag;
+	struct autogroup	*ag, *match = NULL;
 	struct group_ctx	*gc;
 	int			 num = -1, both_match = 0;
 
@@ -363,16 +363,43 @@ group_autogroup(struct client_ctx *cc)
 			    (strcmp(ag->name, cc->res_name) == 0)) {
 				num = ag->num;
 				both_match = 1;
-			} else if (ag->name == NULL && !both_match)
+				match = ag;
+			} else if (ag->name == NULL && !both_match) {
 				num = ag->num;
+				match = ag;
+			}
 		}
 	}
+
+	if (match == NULL)
+		return 0;
 
 	TAILQ_FOREACH(gc, &sc->groupq, entry) {
 		if (gc->num == num) {
 			group_assign(gc, cc);
-			return 1;
+			break;
 		}
 	}
-	return 0;
+
+	if (match->region >= 0) {
+		struct region_ctx	*rc;
+
+		TAILQ_FOREACH(rc, &sc->regionq, entry) {
+			if (rc->num == match->region) {
+				cc->geom.x = rc->work.x +
+				    (rc->work.w - cc->geom.w) / 2;
+				cc->geom.y = rc->work.y +
+				    (rc->work.h - cc->geom.h) / 2;
+				client_resize(cc, 0);
+				break;
+			}
+		}
+	}
+
+	if (match->flags & CLIENT_FULLSCREEN)
+		client_toggle_fullscreen(cc);
+	else if (match->flags & CLIENT_MAXIMIZED)
+		client_toggle_maximize(cc);
+
+	return 1;
 }

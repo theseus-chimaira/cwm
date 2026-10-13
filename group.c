@@ -397,11 +397,17 @@ group_autogroup(struct client_ctx *cc)
 		}
 	}
 
-	if (match->flags & CLIENT_FULLSCREEN)
-		client_toggle_fullscreen(cc);
-	else if (match->flags & CLIENT_MAXIMIZED)
-		client_toggle_maximize(cc);
-	else if (match->flags & (AUTOGROUP_LEFT | AUTOGROUP_RIGHT)) {
+	/*
+	 * Set, don't toggle: a client may already have restored this state
+	 * from _NET_WM_STATE (Firefox and Thunderbird remember "maximized").
+	 */
+	if (match->flags & CLIENT_FULLSCREEN) {
+		if (!(cc->flags & CLIENT_FULLSCREEN))
+			client_toggle_fullscreen(cc);
+	} else if (match->flags & CLIENT_MAXIMIZED) {
+		if ((cc->flags & CLIENT_MAXFLAGS) != CLIENT_MAXIMIZED)
+			client_toggle_maximize(cc);
+	} else if (match->flags & (AUTOGROUP_LEFT | AUTOGROUP_RIGHT)) {
 		struct geom	 area;
 		int		 half;
 

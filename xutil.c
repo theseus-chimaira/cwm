@@ -341,14 +341,15 @@ xu_ewmh_net_desktop_names(struct screen_ctx *sc)
 {
 	struct group_ctx	*gc;
 	char			*p, *q;
-	unsigned char		*prop_ret;
-	int			 i = 0, j = 0, nstrings = 0, n = 0;
+	unsigned char		*prop_ret = NULL;
+	int			 i = 0, j = 0, nstrings = 0, n = 0, nulterm = 0;
 	size_t			 len = 0, tlen, slen;
 
 	/* Let group names be overwritten if _NET_DESKTOP_NAMES is set. */
 
 	if ((j = xu_get_prop(sc->rootwin, ewmh[_NET_DESKTOP_NAMES],
 	    cwmh[UTF8_STRING], 0xffffff, (unsigned char **)&prop_ret)) > 0) {
+		nulterm = (prop_ret[j - 1] == '\0');
 		prop_ret[j - 1] = '\0'; /* paranoia */
 		while (i < j) {
 			if (prop_ret[i++] == '\0')
@@ -368,8 +369,6 @@ xu_ewmh_net_desktop_names(struct screen_ctx *sc)
 		}
 		n++;
 	}
-	if (prop_ret != NULL)
-		XFree(prop_ret);
 
 	TAILQ_FOREACH(gc, &sc->groupq, entry)
 		len += strlen(gc->name) + 1;
@@ -383,8 +382,16 @@ xu_ewmh_net_desktop_names(struct screen_ctx *sc)
 		q += slen;
 	}
 
-	XChangeProperty(X_Dpy, sc->rootwin, ewmh[_NET_DESKTOP_NAMES],
-	    cwmh[UTF8_STRING], 8, PropModeReplace, (unsigned char *)p, len);
+	/*
+	 * Writing the property raises a PropertyNotify that calls us again;
+	 * only write when the names actually changed, or we loop forever.
+	 */
+	if (!(nulterm && (size_t)j == len && memcmp(prop_ret, p, len) == 0))
+		XChangeProperty(X_Dpy, sc->rootwin, ewmh[_NET_DESKTOP_NAMES],
+		    cwmh[UTF8_STRING], 8, PropModeReplace, (unsigned char *)p,
+		    len);
+	if (prop_ret != NULL)
+		XFree(prop_ret);
 	free(p);
 }
 

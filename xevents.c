@@ -91,6 +91,13 @@ xev_handle_maprequest(XEvent *ee)
 
 	if ((cc = client_find(e->window)) == NULL)
 		cc = client_init(e->window, NULL);
+	else if (cc->flags & CLIENT_HIDDEN)
+		/*
+		 * ICCCM 4.1.4: mapping an iconic window asks for it to be
+		 * shown. pinentry-qt maps its dialog iconic first and then
+		 * maps it again, so without this it never appears.
+		 */
+		client_show(cc);
 
 	if ((cc != NULL) && (!(cc->flags & CLIENT_IGNORE)))
 		client_ptr_warp(cc);
@@ -168,6 +175,9 @@ xev_handle_configurerequest(XEvent *ee)
 
 		XConfigureWindow(X_Dpy, cc->win, e->value_mask, &wc);
 		client_config(cc);
+		/* A client restacking itself must not cover ABOVE windows. */
+		if ((e->value_mask & CWStackMode) && !(cc->flags & CLIENT_ABOVE))
+			client_raise_above(sc);
 	} else {
 		/* let it do what it wants, it'll be ours when we map it. */
 		wc.x = e->x;

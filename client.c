@@ -583,6 +583,7 @@ client_show(struct client_ctx *cc)
 
 	cc->flags &= ~CLIENT_HIDDEN;
 	xu_set_wm_state(cc->win, NormalState);
+	xu_ewmh_set_net_wm_state(cc);
 	client_draw_border(cc);
 	client_raise_above(cc->sc);
 }

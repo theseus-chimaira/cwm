@@ -187,7 +187,7 @@ main		: FONTNAME STRING		{
 			free($3);
 		}
 		| AUTOGROUP NUMBER STRING	{
-			if ($2 < 0 || $2 > 9) {
+			if ($2 < 0 || $2 > 8) {
 				yyerror("invalid autogroup");
 				free($3);
 				YYERROR;
@@ -196,7 +196,7 @@ main		: FONTNAME STRING		{
 			free($3);
 		}
 		| AUTOGROUP NUMBER STRING ',' STRING {
-			if ($2 < 0 || $2 > 9) {
+			if ($2 < 0 || $2 > 8) {
 				yyerror("invalid autogroup");
 				free($3);
 				free($5);
@@ -207,7 +207,7 @@ main		: FONTNAME STRING		{
 			free($5);
 		}
 		| AUTOGROUP NUMBER MAXIMIZE STRING {
-			if ($2 < 0 || $2 > 9) {
+			if ($2 < 0 || $2 > 8) {
 				yyerror("invalid autogroup");
 				free($4);
 				YYERROR;
@@ -216,7 +216,7 @@ main		: FONTNAME STRING		{
 			free($4);
 		}
 		| AUTOGROUP NUMBER FULLSCREEN STRING {
-			if ($2 < 0 || $2 > 9) {
+			if ($2 < 0 || $2 > 8) {
 				yyerror("invalid autogroup");
 				free($4);
 				YYERROR;
@@ -225,7 +225,7 @@ main		: FONTNAME STRING		{
 			free($4);
 		}
 		| AUTOGROUP NUMBER MAXIMIZE SCREEN NUMBER STRING {
-			if ($2 < 0 || $2 > 9 || $5 < 0) {
+			if ($2 < 0 || $2 > 8 || $5 < 0) {
 				yyerror("invalid autogroup");
 				free($6);
 				YYERROR;
@@ -234,7 +234,7 @@ main		: FONTNAME STRING		{
 			free($6);
 		}
 		| AUTOGROUP NUMBER FULLSCREEN SCREEN NUMBER STRING {
-			if ($2 < 0 || $2 > 9 || $5 < 0) {
+			if ($2 < 0 || $2 > 8 || $5 < 0) {
 				yyerror("invalid autogroup");
 				free($6);
 				YYERROR;

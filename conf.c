@@ -40,16 +40,15 @@ static const struct {
 	int		 num;
 	const char	*name;
 } group_binds[] = {
-	{ 0, "nogroup" },
-	{ 1, "one" },
-	{ 2, "two" },
-	{ 3, "three" },
-	{ 4, "four" },
-	{ 5, "five" },
-	{ 6, "six" },
-	{ 7, "seven" },
-	{ 8, "eight" },
-	{ 9, "nine" },
+	{ 0, "ALL" },
+	{ 1, "WEB" },
+	{ 2, "MAIL" },
+	{ 3, "TEAMS" },
+	{ 4, "OFFIC" },
+	{ 5, "CHAT" },
+	{ 6, "RDP" },
+	{ 7, "MUSIC" },
+	{ 8, "MISC" },
 };
 static int cursor_binds[] = {
 	XC_left_ptr,		/* CF_NORMAL */
@@ -101,7 +100,6 @@ static const struct {
 	{ FUNC_CC(window-movetogroup-6, client_movetogroup, 6) },
 	{ FUNC_CC(window-movetogroup-7, client_movetogroup, 7) },
 	{ FUNC_CC(window-movetogroup-8, client_movetogroup, 8) },
-	{ FUNC_CC(window-movetogroup-9, client_movetogroup, 9) },
 	{ FUNC_CC(window-snap-center, client_snap, (CWM_CENTER)) },
 	{ FUNC_CC(window-snap-up, client_snap, (CWM_UP)) },
 	{ FUNC_CC(window-snap-down, client_snap, (CWM_DOWN)) },
@@ -154,7 +152,6 @@ static const struct {
 	{ FUNC_SC(group-toggle-6, group_toggle, 6) },
 	{ FUNC_SC(group-toggle-7, group_toggle, 7) },
 	{ FUNC_SC(group-toggle-8, group_toggle, 8) },
-	{ FUNC_SC(group-toggle-9, group_toggle, 9) },
 	{ FUNC_SC(group-only-1, group_only, 1) },
 	{ FUNC_SC(group-only-2, group_only, 2) },
 	{ FUNC_SC(group-only-3, group_only, 3) },
@@ -163,7 +160,6 @@ static const struct {
 	{ FUNC_SC(group-only-6, group_only, 6) },
 	{ FUNC_SC(group-only-7, group_only, 7) },
 	{ FUNC_SC(group-only-8, group_only, 8) },
-	{ FUNC_SC(group-only-9, group_only, 9) },
 	{ FUNC_SC(group-close-1, group_close, 1) },
 	{ FUNC_SC(group-close-2, group_close, 2) },
 	{ FUNC_SC(group-close-3, group_close, 3) },
@@ -172,7 +168,6 @@ static const struct {
 	{ FUNC_SC(group-close-6, group_close, 6) },
 	{ FUNC_SC(group-close-7, group_close, 7) },
 	{ FUNC_SC(group-close-8, group_close, 8) },
-	{ FUNC_SC(group-close-9, group_close, 9) },
 
 	{ FUNC_SC(pointer-move-up, ptrmove, (CWM_UP)) },
 	{ FUNC_SC(pointer-move-down, ptrmove, (CWM_DOWN)) },
@@ -239,7 +234,6 @@ static const struct {
 	{ "CM-6",	"group-toggle-6" },
 	{ "CM-7",	"group-toggle-7" },
 	{ "CM-8",	"group-toggle-8" },
-	{ "CM-9",	"group-toggle-9" },
 	{ "M-Right",	"group-cycle" },
 	{ "M-Left",	"group-rcycle" },
 	{ "CM-g",	"window-group" },

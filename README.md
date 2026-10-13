@@ -57,19 +57,19 @@ do not need a new rule for every combination. Documented in `cwmrc(5)`.
 ### Group names by purpose, no group 9
 
 Groups are named after what they hold instead of `one` ... `nine`; every name
-is at most five characters so bars such as polybar's `xworkspaces` stay narrow:
+is at most six characters so bars such as polybar's `xworkspaces` stay narrow:
 
-| # | name    |
-|---|---------|
-| 0 | `ALL`   |
-| 1 | `WEB`   |
-| 2 | `MAIL`  |
-| 3 | `TEAMS` |
-| 4 | `OFFIC` |
-| 5 | `CHAT`  |
-| 6 | `RDP`   |
-| 7 | `MUSIC` |
-| 8 | `MISC`  |
+| # | name     |
+|---|----------|
+| 0 | `ALL`    |
+| 1 | `WEB`    |
+| 2 | `MAIL`   |
+| 3 | `TEAMS`  |
+| 4 | `OFFICE` |
+| 5 | `CHAT`   |
+| 6 | `RDP`    |
+| 7 | `MUSIC`  |
+| 8 | `MISC`   |
 
 Group 9 is gone, together with `group-toggle-9`, `group-only-9`,
 `group-close-9`, `window-movetogroup-9` and the default `CM-9` binding.

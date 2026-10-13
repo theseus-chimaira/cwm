@@ -44,7 +44,7 @@ static const struct {
 	{ 1, "WEB" },
 	{ 2, "MAIL" },
 	{ 3, "TEAMS" },
-	{ 4, "OFFIC" },
+	{ 4, "OFFICE" },
 	{ 5, "CHAT" },
 	{ 6, "RDP" },
 	{ 7, "MUSIC" },

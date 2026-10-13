@@ -156,7 +156,10 @@ kbfunc_client_move_mb(void *ctx, struct cargs *cargs)
 	Time			 ltime = 0;
 	struct screen_ctx	*sc = cc->sc;
 	struct geom		 area;
+	GC			 gc;
+	XGCValues		 gcv;
 	int			 move = 1;
+	int			 rx, ry, rw, rh;
 
 	client_raise(cc);
 
@@ -169,6 +172,20 @@ kbfunc_client_move_mb(void *ctx, struct cargs *cargs)
 	    GrabModeAsync, GrabModeAsync, None, Conf.cursor[CF_MOVE],
 	    CurrentTime) != GrabSuccess)
 		return;
+
+	gcv.function = GXxor;
+	gcv.foreground = ~0L;
+	gcv.subwindow_mode = IncludeInferiors;
+	gcv.line_width = MAX(1, cc->bwidth);
+	gc = XCreateGC(X_Dpy, sc->rootwin,
+	    GCFunction | GCForeground | GCSubwindowMode | GCLineWidth, &gcv);
+
+	rx = cc->geom.x;
+	ry = cc->geom.y;
+	rw = cc->geom.w + cc->bwidth * 2 - 1;
+	rh = cc->geom.h + cc->bwidth * 2 - 1;
+	XDrawRectangle(X_Dpy, sc->rootwin, gc, rx, ry, rw, rh);
+	XFlush(X_Dpy);
 
 	screen_prop_win_create(sc, cc->win);
 	screen_prop_win_draw(sc, "%+5d%+5d", cc->geom.x, cc->geom.y);
@@ -193,7 +210,14 @@ kbfunc_client_move_mb(void *ctx, struct cargs *cargs)
 			cc->geom.y += client_snapcalc(cc->geom.y,
 			    cc->geom.y + cc->geom.h + (cc->bwidth * 2),
 			    area.y, area.y + area.h, sc->snapdist);
-			client_move(cc);
+
+			/* erase old frame, draw new frame */
+			XDrawRectangle(X_Dpy, sc->rootwin, gc, rx, ry, rw, rh);
+			rx = cc->geom.x;
+			ry = cc->geom.y;
+			XDrawRectangle(X_Dpy, sc->rootwin, gc, rx, ry, rw, rh);
+			XFlush(X_Dpy);
+
 			screen_prop_win_draw(sc,
 			    "%+5d%+5d", cc->geom.x, cc->geom.y);
 			break;
@@ -202,6 +226,11 @@ kbfunc_client_move_mb(void *ctx, struct cargs *cargs)
 			break;
 		}
 	}
+	/* erase final frame */
+	XDrawRectangle(X_Dpy, sc->rootwin, gc, rx, ry, rw, rh);
+	XFlush(X_Dpy);
+	XFreeGC(X_Dpy, gc);
+
 	if (ltime)
 		client_move(cc);
 	screen_prop_win_destroy(sc);
@@ -244,7 +273,10 @@ kbfunc_client_resize_mb(void *ctx, struct cargs *cargs)
 	XEvent			 ev;
 	Time			 ltime = 0;
 	struct screen_ctx	*sc = cc->sc;
+	GC			 gc;
+	XGCValues		 gcv;
 	int			 resize = 1;
+	int			 rw, rh;
 
 	if (cc->flags & CLIENT_FREEZE)
 		return;
@@ -258,6 +290,19 @@ kbfunc_client_resize_mb(void *ctx, struct cargs *cargs)
 	    GrabModeAsync, GrabModeAsync, None, Conf.cursor[CF_RESIZE],
 	    CurrentTime) != GrabSuccess)
 		return;
+
+	gcv.function = GXxor;
+	gcv.foreground = ~0L;
+	gcv.subwindow_mode = IncludeInferiors;
+	gcv.line_width = MAX(1, cc->bwidth);
+	gc = XCreateGC(X_Dpy, sc->rootwin,
+	    GCFunction | GCForeground | GCSubwindowMode | GCLineWidth, &gcv);
+
+	rw = cc->geom.w + cc->bwidth * 2 - 1;
+	rh = cc->geom.h + cc->bwidth * 2 - 1;
+	XDrawRectangle(X_Dpy, sc->rootwin, gc,
+	    cc->geom.x, cc->geom.y, rw, rh);
+	XFlush(X_Dpy);
 
 	screen_prop_win_create(sc, cc->win);
 	screen_prop_win_draw(sc, "%4d x %-4d", cc->dim.w, cc->dim.h);
@@ -273,7 +318,18 @@ kbfunc_client_resize_mb(void *ctx, struct cargs *cargs)
 			cc->geom.w = ev.xmotion.x - cc->geom.x - cc->bwidth;
 			cc->geom.h = ev.xmotion.y - cc->geom.y - cc->bwidth;
 			client_apply_sizehints(cc);
-			client_resize(cc, 1);
+			cc->dim.w = (cc->geom.w - cc->hint.basew) / cc->hint.incw;
+			cc->dim.h = (cc->geom.h - cc->hint.baseh) / cc->hint.inch;
+
+			/* erase old frame, draw new frame */
+			XDrawRectangle(X_Dpy, sc->rootwin, gc,
+			    cc->geom.x, cc->geom.y, rw, rh);
+			rw = cc->geom.w + cc->bwidth * 2 - 1;
+			rh = cc->geom.h + cc->bwidth * 2 - 1;
+			XDrawRectangle(X_Dpy, sc->rootwin, gc,
+			    cc->geom.x, cc->geom.y, rw, rh);
+			XFlush(X_Dpy);
+
 			screen_prop_win_draw(sc,
 			    "%4d x %-4d", cc->dim.w, cc->dim.h);
 			break;
@@ -282,6 +338,12 @@ kbfunc_client_resize_mb(void *ctx, struct cargs *cargs)
 			break;
 		}
 	}
+	/* erase final frame */
+	XDrawRectangle(X_Dpy, sc->rootwin, gc,
+	    cc->geom.x, cc->geom.y, rw, rh);
+	XFlush(X_Dpy);
+	XFreeGC(X_Dpy, gc);
+
 	if (ltime)
 		client_resize(cc, 1);
 	screen_prop_win_destroy(sc);
